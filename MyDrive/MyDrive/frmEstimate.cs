@@ -1,0 +1,163 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+//Author: Jan Falkowski
+namespace MyDrive
+{
+    public partial class frmEstimate : Form
+    {
+        double dbMaterialPrice = 35.75, dbFoundation = 1, dbGBP, dbEuro;  // GLobal variables
+        string strMaterial = "Brick", strFoundation = "Standart";
+        public frmEstimate()
+        {
+            InitializeComponent();
+        }
+
+        private void DisplayComponents(bool bool1, bool bool2)  //method which displays and hides components
+        {
+            lblExchangeRate.Visible = bool1;
+            txtExchangeRate.Visible = bool1;
+            lblEurosTop.Visible = bool1;
+
+            lblPricePerSquareMetre.Visible = bool1;
+            txtBrick.Visible = bool1;
+            txtConcrete.Visible = bool1;
+            txtTarmac.Visible = bool1;
+            txtGravel.Visible = bool1;
+
+            cmdStart.Visible = bool1;
+
+            grpFoundations.Visible = bool2;
+
+            lblLength.Visible = bool2;
+            txtLenght.Visible = bool2;
+            lblMetres1.Visible = bool2;
+            lblWidth.Visible = bool2;
+            txtWidth.Visible = bool2;
+            lblMetres2.Visible = bool2;
+
+            lblGBP.Visible = bool2;
+            txtGBP.Visible = bool2;
+            lblEuro.Visible = bool2;
+            txtEuro.Visible = bool2;
+
+            lblOutput.Visible = bool2;
+
+            cmdCalculate.Visible = bool2;
+            cmdClear.Visible = bool2;
+
+            if (lblExchangeRate.Visible)  // if statement responsible for setting colour of top label
+            {
+                lblEuroDrivesOrPatios.ForeColor = Color.Red;
+            }
+            else lblEuroDrivesOrPatios.ForeColor = Color.Green;
+
+
+        }
+        private void Calculate()  // method which parses numbers from according textboxes and calculates GBP and Euro Price 
+        {
+            double  dbLenght, dbWidth, dbRate;
+
+            dbRate = double.Parse(txtExchangeRate.Text);
+            dbLenght = double.Parse(txtLenght.Text);
+            dbWidth = double.Parse(txtWidth.Text);
+            dbGBP = dbLenght * dbWidth * dbMaterialPrice * dbFoundation;
+            dbEuro = dbGBP * dbRate;
+        }
+        private void ClearTextBoxes() //method which clears txt boxes and get's back to state from figure 3
+        {
+            txtLenght.Clear();
+            txtWidth.Clear();
+            txtGBP.Text = "1";
+            txtEuro.Text = txtExchangeRate.Text;
+            lblOutput.Text = "";
+            lblOutput.BackColor = Color.Green;
+        }
+
+        private void cmdStart_Click(object sender, EventArgs e)
+        {
+            if (txtExchangeRate.TextLength == 0 || txtBrick.TextLength == 0 || txtConcrete.TextLength == 0 || txtTarmac.TextLength == 0 || txtGravel.TextLength == 0)
+            { // in case when any of required text fields is empty according message shows up
+                MessageBox.Show("Exchange Rate or Prices not Entered", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else
+            {  // if criteria is met invokes method which displays and hides components
+                DisplayComponents(false, true);
+                txtEuro.Text = txtExchangeRate.Text;
+            }
+        }
+
+        private void rdbBrick_CheckedChanged(object sender, EventArgs e)
+        {  //when radio button is changed event assigns Material price and string used in output label
+            dbMaterialPrice = double.Parse(txtBrick.Text); 
+            strMaterial = "Brick"; 
+        }
+
+        private void rdbConcrete_CheckedChanged(object sender, EventArgs e)
+        {  //when radio button is changed event assigns Material price and string used in output label
+            dbMaterialPrice = double.Parse(txtConcrete.Text);
+            strMaterial = "Concrete";
+        }
+
+        private void rdbTarmac_CheckedChanged(object sender, EventArgs e)
+        {  //when radio button is changed event assigns Material price and string used in output label
+            dbMaterialPrice = double.Parse(txtTarmac.Text);
+            strMaterial = "Tarmac";
+        }
+
+        private void rdbGravel_CheckedChanged(object sender, EventArgs e)
+        {  //when radio button is changed event assigns Material price and string used in output label
+            dbMaterialPrice = double.Parse(txtGravel.Text);
+            strMaterial = "Gravel";
+        }
+
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        { //exit button in menu strip shows message box with yes or no question, when yes is pressed exits application
+            DialogResult result = MessageBox.Show("Are you sure you want to exit this application", "Exit", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (result == DialogResult.Yes)
+            {
+                Application.Exit();
+            }
+        }
+
+        private void rdbStandard_CheckedChanged(object sender, EventArgs e)
+        {  //when radio button is changed event assigns Foundation price and string used in output label
+            dbFoundation = 1;
+            strFoundation = "Standatd";
+        }
+
+        private void rdbExtraDeep_CheckedChanged(object sender, EventArgs e)
+        { //when radio button is changed event assigns Foundation price and string used in output label
+            dbFoundation = 1.25;
+            strFoundation = "Extra Deep";
+        }
+
+        private void cmdCalculate_Click(object sender, EventArgs e)
+        {
+            if(txtLenght.TextLength==0 || txtWidth.TextLength == 0)
+            { //if Lenght or Width text fields are empty message box is shown
+                MessageBox.Show("Lenght, Width not entered.\n Please enter dimensions", "Reminder", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+            }
+            else
+            { // if criteria is met code is executed
+                Calculate(); //method calculatig price GBP and Euro
+                txtGBP.Text = "£ " + dbGBP.ToString("F"); // Changes GBP text field to calculated price and formats number 
+                txtEuro.Text = "€ " + dbEuro.ToString("F"); // Changes Euro text field to calculated price and formats number 
+                lblOutput.Text = strMaterial + " selected with " + strFoundation + " foundation"; // Changes Output label according to selected radio buttons
+                lblOutput.BackColor = Color.White; // changes back colour of label to white
+            }
+        }
+
+        private void cmdClear_Click(object sender, EventArgs e)
+        {
+            ClearTextBoxes(); // on button Clear click calls Clear Method
+
+        }
+    }
+}
